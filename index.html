@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SKIN VIEWER // 3D Minecraft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <div id="fx"></div>
+    <div id="vignette"></div>
+    <div id="fps">FPS --</div>
+    <div id="drophint">DROP SKIN PNG TO LOAD</div>
+  </div>
+
+  <aside id="sidebar">
+    <h1>SKIN&nbsp;VIEWER</h1>
+    <p class="subtitle">3D · NEON · ARCADE</p>
+
+    <div class="card">
+      <h2>UPLOAD SKIN</h2>
+      <div id="dropzone">
+        <span class="big">&#128193;</span>
+        DRAG &amp; DROP PNG<br>OR CLICK TO BROWSE
+      </div>
+      <input id="file" type="file" accept="image/png,image/*" hidden />
+      <div id="filename">steve.png <span id="fmt">(default · 64&times;64)</span></div>
+    </div>
+
+    <div class="card">
+      <h2>ANIMATIONS</h2>
+      <div class="grid" id="anims">
+        <button class="anim active" data-anim="idle"><span class="ico">&#129485;</span>IDLE</button>
+        <button class="anim" data-anim="walk"><span class="ico">&#128694;</span>WALK</button>
+        <button class="anim" data-anim="run"><span class="ico">&#127939;</span>RUN</button>
+        <button class="anim" data-anim="wave"><span class="ico">&#128075;</span>WAVE</button>
+        <button class="anim" data-anim="jump"><span class="ico">&#11014;</span>JUMP</button>
+        <button class="anim" data-anim="dance"><span class="ico">&#128131;</span>DANCE</button>
+        <button class="anim" data-anim="sneak"><span class="ico">&#129399;</span>SNEAK</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>LAYERS</h2>
+      <div class="row">
+        <button id="hatBtn" class="active"><span class="ico">&#127913;</span>HAT</button>
+        <button id="jacketBtn" class="active"><span class="ico">&#129509;</span>JACKET</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>CAMERA</h2>
+      <div class="row" style="margin-bottom:8px;">
+        <button id="rotateBtn"><span class="ico">&#128260;</span>AUTO-ROTATE</button>
+      </div>
+      <button id="resetBtn" class="full"><span class="ico">&#127919;</span>RESET VIEW</button>
+      <p class="hint">DRAG = ROTATE · SCROLL = ZOOM<br>RIGHT-DRAG = PAN</p>
+    </div>
+  </aside>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
