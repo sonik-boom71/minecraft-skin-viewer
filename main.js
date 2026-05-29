@@ -290,6 +290,68 @@ function makeDefaultSkin() {
 applySkin(makeDefaultSkin(), 'steve.png');
 
 /* ============================================================
+   EXAMPLE SKINS GALLERY
+   Real player skins pulled from minotar.net, which serves the
+   raw texture with `Access-Control-Allow-Origin: *` so the image
+   is not tainted and WebGL can use it. mc-heads.net is the fallback.
+   Notch & jeb_ are classic 64x32 skins — they exercise that path too.
+   ============================================================ */
+const EXAMPLES = [
+  { name: 'Steve',      user: 'MHF_Steve' },
+  { name: 'Alex',       user: 'MHF_Alex' },
+  { name: 'Notch',      user: 'Notch' },
+  { name: 'jeb_',       user: 'jeb_' },
+  { name: 'Techno',     user: 'Technoblade' },
+  { name: 'Dream',      user: 'Dream' },
+  { name: 'Sparklez',   user: 'CaptainSparklez' },
+  { name: 'Skeppy',     user: 'Skeppy' },
+  { name: 'Tommy',      user: 'TommyInnit' },
+];
+
+const skinURL    = u => `https://minotar.net/skin/${u}`;
+const skinURLAlt = u => `https://mc-heads.net/skin/${u}`;
+const faceURL    = u => `https://minotar.net/helm/${u}/48`;
+
+function loadSkinFromURL(url, name, altUrl) {
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => applySkin(img, name);
+  img.onerror = () => {
+    if (altUrl) loadSkinFromURL(altUrl, name, null);
+    else flashError('load failed: ' + name);
+  };
+  img.src = url;
+}
+
+function clearGallerySelection() {
+  document.querySelectorAll('.skin-tile').forEach(t => t.classList.remove('active'));
+}
+
+const galleryEl = document.getElementById('gallery');
+EXAMPLES.forEach(ex => {
+  const tile = document.createElement('button');
+  tile.className = 'skin-tile';
+  tile.title = ex.user;
+
+  const img = document.createElement('img');
+  img.alt = ex.name;
+  img.loading = 'lazy';
+  img.src = faceURL(ex.user);
+
+  const nm = document.createElement('span');
+  nm.className = 'nm';
+  nm.textContent = ex.name;
+
+  tile.append(img, nm);
+  tile.addEventListener('click', () => {
+    clearGallerySelection();
+    tile.classList.add('active');
+    loadSkinFromURL(skinURL(ex.user), ex.name, skinURLAlt(ex.user));
+  });
+  galleryEl.appendChild(tile);
+});
+
+/* ============================================================
    ANIMATION SYSTEM  (smoothly blended poses)
    ============================================================ */
 const NEUTRAL = {
@@ -467,7 +529,7 @@ function loadFile(file) {
   const reader = new FileReader();
   reader.onload = ev => {
     const img = new Image();
-    img.onload = () => applySkin(img, file.name);
+    img.onload = () => { clearGallerySelection(); applySkin(img, file.name); };
     img.onerror = () => flashError('Could not read image');
     img.src = ev.target.result;
   };
