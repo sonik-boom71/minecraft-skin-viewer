@@ -14,8 +14,10 @@ import {
 
 /* ---------- toasts ---------- */
 let toastWrap;
+const MAX_TOASTS = 3;
 export function toast(msg, ms = 2200) {
   if (!toastWrap) toastWrap = document.getElementById('toasts');
+  while (toastWrap.children.length >= MAX_TOASTS) toastWrap.firstElementChild.remove();
   const t = document.createElement('div');
   t.className = 'toast'; t.textContent = msg;
   toastWrap.appendChild(t);

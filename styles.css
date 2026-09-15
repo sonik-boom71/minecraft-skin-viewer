@@ -157,6 +157,9 @@ button:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.6);box-shadow:no
 button.active{border-color:var(--lime);color:var(--lime);background:rgba(57,255,20,.12);
   box-shadow:0 0 12px var(--lime), 0 0 4px var(--lime) inset;text-shadow:0 0 6px var(--lime);}
 button.active .ico{filter:drop-shadow(0 0 6px var(--lime));}
+button.is-loading{pointer-events:none;opacity:.65;}
+button.is-loading .ico{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 .full{width:100%;flex-direction:row;justify-content:center;}
 .row{display:flex;gap:8px;}
 .row>button{flex:1;}
@@ -198,7 +201,8 @@ select{font-family:ui-monospace,monospace;font-size:11px;color:var(--txt);backgr
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .skin-tile{padding:8px 4px 7px;gap:5px;}
 .skin-tile img{width:42px;height:42px;image-rendering:pixelated;border-radius:4px;
-  background:rgba(0,245,255,.06);border:1px solid rgba(0,245,255,.15);}
+  background:rgba(0,245,255,.06);border:1px solid rgba(0,245,255,.15);transition:.13s;}
+.skin-tile:hover img{border-color:var(--cyan);box-shadow:0 0 10px rgba(0,245,255,.4);}
 .skin-tile .nm{font-family:ui-monospace,monospace;font-size:9px;letter-spacing:0;color:var(--muted);
   max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .skin-tile:hover .nm{color:#fff;}
@@ -277,6 +281,17 @@ select{font-family:ui-monospace,monospace;font-size:11px;color:var(--txt);backgr
 .keys td{padding:6px 8px;border-bottom:1px solid rgba(0,245,255,.12);}
 .keys td:first-child{color:var(--lime);white-space:nowrap;width:38%;}
 .keys td:last-child{color:var(--txt);}
+
+/* ---------- accessibility & fit-and-finish ---------- */
+#sidebar,.strip,.kf{scrollbar-width:thin;scrollbar-color:rgba(0,245,255,.35) transparent;}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:4px;}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(0,245,255,.4),0 0 8px var(--cyan);}
+.skin-tile:focus-visible img,.hist-tile:focus-visible img{border-color:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important;}
+}
 
 /* ---------- mobile: sidebar becomes bottom drawer ---------- */
 @media (max-width:760px){

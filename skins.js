@@ -25,20 +25,27 @@ export const COLLECTIONS = {
 };
 export const RANDOM_NAMES = [...new Set(Object.values(COLLECTIONS).flat())];
 
-export function loadSkinFromURL(url, name, altUrl, nick = null) {
+export function loadSkinFromURL(url, name, altUrl, nick = null, onSettled) {
   const img = new Image();
   img.crossOrigin = 'anonymous';
-  img.onload = () => applySkin(img, name, nick);
+  img.onload = () => { applySkin(img, name, nick); onSettled?.(true); };
   img.onerror = () => {
-    if (altUrl) loadSkinFromURL(altUrl, name, null, nick);
-    else { toast('⚠ Could not load ' + name); emit('loadfail', name); }
+    if (altUrl) loadSkinFromURL(altUrl, name, null, nick, onSettled);
+    else { toast('⚠ Could not load ' + name); emit('loadfail', name); onSettled?.(false); }
   };
   img.src = url;
 }
-export function loadByNick(nick) {
+export function loadByNick(nick, onSettled) {
   const clean = nick.trim().replace(/[^A-Za-z0-9_]/g, '');
-  if (!clean) return;
-  loadSkinFromURL(skinURL(clean), clean, skinURLAlt(clean), clean);
+  if (!clean) { onSettled?.(false); return; }
+  loadSkinFromURL(skinURL(clean), clean, skinURLAlt(clean), clean, onSettled);
+}
+
+/* small loading-state helper for buttons that trigger a network fetch */
+function withLoading(btn, run) {
+  if (btn.classList.contains('is-loading')) return;
+  btn.classList.add('is-loading');
+  run(() => btn.classList.remove('is-loading'));
 }
 
 function loadFromDataURL(dataURL, name, nick = null) {
@@ -63,7 +70,7 @@ function renderGallery() {
     tile.addEventListener('click', () => {
       document.querySelectorAll('.skin-tile').forEach(t => t.classList.remove('active'));
       tile.classList.add('active');
-      loadSkinFromURL(skinURL(user), user.replace(/^MHF_/, ''), skinURLAlt(user), user);
+      withLoading(tile, done => loadSkinFromURL(skinURL(user), user.replace(/^MHF_/, ''), skinURLAlt(user), user, done));
     });
     galleryEl.appendChild(tile);
   });
@@ -94,7 +101,10 @@ function renderStrip(id, list, isHistory) {
     const wrap = document.createElement('div');
     wrap.className = 'hist-tile'; wrap.title = item.name;
     const img = document.createElement('img'); img.src = item.data; img.alt = item.name;
-    img.addEventListener('click', () => loadFromDataURL(item.data, item.name, item.nick));
+    img.tabIndex = 0; img.setAttribute('role', 'button');
+    const activate = () => loadFromDataURL(item.data, item.name, item.nick);
+    img.addEventListener('click', activate);
+    img.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
     wrap.appendChild(img);
     if (!isHistory) {
       const x = document.createElement('button');
@@ -166,15 +176,20 @@ export function initSkins() {
 
   // search by nick
   const nickInput = document.getElementById('nickInput');
-  const go = () => { if (nickInput.value.trim()) { loadByNick(nickInput.value); emit('achieve', 'searcher'); } };
-  document.getElementById('nickGo').addEventListener('click', go);
+  const nickGoBtn = document.getElementById('nickGo');
+  const go = () => {
+    const val = nickInput.value.trim();
+    if (!val) return;
+    withLoading(nickGoBtn, done => loadByNick(val, ok => { done(); if (ok) emit('achieve', 'searcher'); }));
+  };
+  nickGoBtn.addEventListener('click', go);
   nickInput.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
 
   // random
-  document.getElementById('randomBtn').addEventListener('click', () => {
+  const randomBtn = document.getElementById('randomBtn');
+  randomBtn.addEventListener('click', () => {
     const u = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
-    loadSkinFromURL(skinURL(u), u.replace(/^MHF_/, ''), skinURLAlt(u), u);
-    emit('achieve', 'gambler');
+    withLoading(randomBtn, done => loadSkinFromURL(skinURL(u), u.replace(/^MHF_/, ''), skinURLAlt(u), u, ok => { done(); if (ok) emit('achieve', 'gambler'); }));
   });
 
   // convert + favorite
